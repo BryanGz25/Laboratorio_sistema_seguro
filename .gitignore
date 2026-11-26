@@ -1,0 +1,13 @@
+# Dependencias y builds
+node_modules/
+dist/
+
+# Secretos y configuración local
+.env
+.env.*
+!.env.example
+
+# Base de datos local y logs
+finvault/localdb/data/
+finvault/localdb/db.log
+*.log
