@@ -11,8 +11,15 @@ const start = async (): Promise<void> => {
   await sequelize.authenticate();
 
   if (isProduction) {
-    // En producción el esquema se gestiona con migraciones, nunca con sync().
-    logger.info({ event: 'startup' }, 'database_connected');
+    // En producción el esquema se gestiona con migraciones. Excepción controlada:
+    // DATABASE_SYNC=true crea las tablas faltantes (sin alterar las existentes).
+    // Úsalo solo para el primer arranque y luego elimina la variable.
+    if (process.env.DATABASE_SYNC === 'true') {
+      await sequelize.sync();
+      logger.warn({ event: 'startup' }, 'database_synced_once');
+    } else {
+      logger.info({ event: 'startup' }, 'database_connected');
+    }
   } else {
     await sequelize.sync();
     logger.info({ event: 'startup' }, 'database_synced_dev');
